@@ -1,6 +1,9 @@
 package edu.uwindsor.geoquiz
 
+import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +13,7 @@ import android.widget.Toast
 //import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 
@@ -24,12 +28,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: ImageButton
     private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
+    private lateinit var apiTextView: TextView
     private lateinit var cheatButton: Button
+
+    
 
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProviders.of(this).get(QuizViewModel::class.java)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
@@ -47,6 +55,10 @@ class MainActivity : AppCompatActivity() {
         prevButton = findViewById(R.id.prev_button)
         questionTextView = findViewById(R.id.question_text_view)
         cheatButton = findViewById(R.id.cheat_button)
+        apiTextView = findViewById(R.id.textView)
+
+        apiTextView.text = getString(R.string.apiLevel, Build.VERSION.RELEASE)
+        Toast.makeText(this, Build.VERSION.RELEASE, Toast.LENGTH_LONG).show()
 
         trueButton.setOnClickListener{
             checkAnswer(true)
@@ -75,15 +87,27 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        cheatButton.setOnClickListener {
+        cheatButton.setOnClickListener {view ->
             // Start CheatActivity
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            val options = ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
         }
 
             updateQuestion()
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
     }
 
     override fun onStart() {
@@ -127,6 +151,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion(){
+        quizViewModel.isCheater = false
         val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
         Log.d(TAG, quizViewModel.marks.toString())
@@ -142,7 +167,6 @@ class MainActivity : AppCompatActivity() {
         if (!quizViewModel.marks.contains(2)){//if you are done the quiz,
             val finalMarks = "%.2f".format((quizViewModel.marks.sum().toDouble()/quizViewModel.questionBankSize)*100)
             val toaster = Toast.makeText(this, "Completed with a final mark of $finalMarks%", Toast.LENGTH_LONG)
-            toaster.setGravity(Gravity.TOP, 0, 200)
             toaster.show()
         }
     }
@@ -150,16 +174,24 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean){
         val correctAnswer = quizViewModel.currentQuestionAnswer
 
-        val messageResId = if(userAnswer == correctAnswer){
-            quizViewModel.marks[quizViewModel.currentIndex] = 1
-            R.string.correct_toast
-        }else{
-            quizViewModel.marks[quizViewModel.currentIndex] = 0
-            R.string.incorrect_toast
+        var messageResId = when {
+            quizViewModel.isCheater -> {
+                quizViewModel.marks[quizViewModel.currentIndex] = 0
+
+                R.string.judgment_toast
+            }
+            userAnswer == correctAnswer -> {
+                quizViewModel.marks[quizViewModel.currentIndex] = 1
+                R.string.correct_toast
+            }
+            else -> {
+                quizViewModel.marks[quizViewModel.currentIndex] = 0
+                R.string.incorrect_toast
+            }
         }
 
         val toaster = Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
-        toaster.setGravity(Gravity.TOP, 0, 200)
         toaster.show()
+
     }
 }

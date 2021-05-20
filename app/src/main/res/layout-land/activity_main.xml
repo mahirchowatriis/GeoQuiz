@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
         android:padding="24dp"
         tools:text="@string/question_australia" />
 
@@ -46,28 +47,34 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal">
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="50dp">
 
         <ImageButton
             android:id="@+id/prev_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
             android:contentDescription="@string/content_desc_left"
-            android:src="@drawable/arrow_left"
-            style="?android:attr/borderlessButtonStyle"
-            />
+            android:src="@drawable/arrow_left" />
 
         <ImageButton
             android:id="@+id/next_button"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:contentDescription="@string/content_desc_right"
-            android:src="@drawable/arrow_right"
-            style="?android:attr/borderlessButtonStyle"
-            />
+            android:src="@drawable/arrow_right" />
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/apiLevel"
+        android:textAlignment="center" />
 </FrameLayout>

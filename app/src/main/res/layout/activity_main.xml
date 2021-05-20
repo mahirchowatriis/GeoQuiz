@@ -9,6 +9,7 @@
         android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
         android:gravity="center"
         android:padding="24dp"
         tools:text="@string/question_australia" />
@@ -58,6 +59,7 @@
             android:contentDescription="@string/content_desc_right"
             style="?android:attr/borderlessButtonStyle"
             />
+
     </LinearLayout>
 
     <Button
@@ -67,5 +69,13 @@
         android:layout_marginTop="24dp"
         android:text="@string/cheat_button"
         />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/apiLevel"
+        android:textAlignment="center" />
 
 </LinearLayout>

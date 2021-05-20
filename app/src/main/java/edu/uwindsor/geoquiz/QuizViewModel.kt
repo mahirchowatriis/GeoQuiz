@@ -37,4 +37,5 @@ class QuizViewModel : ViewModel() {
 
     var marks = mutableListOf(2, 2, 2, 2, 2, 2)
     var currentIndex = 0
+    var isCheater = false
 }
